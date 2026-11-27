@@ -3,10 +3,78 @@ version: 2
 sources:
   - name: raw
     schema: gz_raw_data
+    description: "Raw data from Greenweez."
+
+    config:
+          loaded_at_field: "CAST(date_date AS TIMESTAMP)"
+          freshness:
+            warn_after:
+              count: 90
+              period: day
+
     tables:
       - name: sales
         identifier: raw_gz_sales
+        description: "Raw sales transactions."
+
+        tests:
+          - unique:
+              arguments:
+                column_name: "CONCAT(CAST(orders_id AS STRING), '-', CAST(pdt_id AS STRING))"
+
+        columns:
+          - name: date_date
+            description: "Date of the sale."
+
+          - name: orders_id
+            description: "Order identifier."
+            tests:
+              - not_null
+
+          - name: pdt_id
+            description: "Product identifier."
+            tests:
+              - not_null
+
+          - name: revenue
+            description: "Sales revenue."
+
+          - name: quantity
+            description: "Quantity sold."
+
       - name: product
         identifier: raw_gz_product
+        description: "Product information."
+
+        columns:
+          - name: products_id
+            description: "Primary key of the product table."
+            tests:
+              - unique
+              - not_null
+
+          - name: purchse_price
+            description: "Purchase price per product."
+
       - name: ship
         identifier: raw_gz_ship
+        description: "Shipping and logistics information."
+
+        columns:
+          - name: orders_id
+            description: "Primary key of the shipping table."
+            tests:
+              - unique
+              - not_null
+
+          - name: shipping_fee
+            description: "Shipping fee."
+
+          - name: shipping_fee_1
+            description: "Second shipping fee field."
+
+          - name: logcost
+            description: "Logistics cost."
+
+          - name: ship_cost
+            description: "Shipping cost."
